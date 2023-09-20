@@ -1,0 +1,82 @@
+{% include "header.html" %}
+
+<!-- Page Header-->
+<header
+  class="masthead"
+  style="background-image: url('../static/assets/img/home.jpg')"
+>
+  <div class="container position-relative px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+      <div class="col-md-10 col-lg-8 col-xl-7">
+        <div class="site-heading">
+          <h1>Recent Posts</h1>
+          <span class="subheading"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+<!-- Main Content-->
+<div class="container px-4 px-lg-5">
+  <div class="row gx-4 gx-lg-5 justify-content-center">
+    <div class="col-md-10 col-lg-8 col-xl-7">
+      <!-- Post preview-->
+      {% for post in all_posts %}
+      <div class="post-preview">
+        <a href="{{ url_for('show_post', post_id=post.id) }}">
+          <h2 class="post-title">{{ post.title }}</h2>
+          <h3 class="post-subtitle">{{ post.subtitle }}</h3>
+        </a>
+        <!-- TODO: Add code to delete posts below -->
+        <p class="post-meta">
+          Posted by
+          <a href="{{url_for('get_posts_by_author', author_name=post.author)}}">{{post.author}}</a>
+          on {{post.date}}
+        </p>
+      </div>
+      <!-- Divider-->
+      <hr class="my-4" />
+      {% endfor %}
+
+      {% if current_user.is_authenticated: %}
+      <!-- New Post -->
+        <div class="d-flex justify-content-end mb-4">
+        <!-- TODO: Adding new posts -->
+          <a
+            class="btn btn-primary float-right"
+            href="{{url_for('add_new_post')}}"
+            >Create New Post</a
+          >
+        </div>
+      {% endif %}
+
+      <!-- Pager-->
+      <!-- Display posts -->
+<!-- Add your code to display the posts here -->
+
+<!-- Pagination -->
+<style>
+  .btn-no-underline {
+    text-decoration: none !important;
+  }
+</style>
+
+<div class="pagination" style="margin-bottom: 15px;">
+  <div class="container d-flex justify-content-between">
+    <div>
+      {% if has_more_posts %}
+        <a class="btn btn-secondary btn-sm text-uppercase" href="{{ url_for('get_all_posts', page=page+1) }}">← Older Posts</a>
+      {% endif %}
+    </div>
+    <div class="ml-auto">
+      {% if page > 1 %}
+        <a class="btn btn-secondary btn-sm text-uppercase" href="{{ url_for('get_all_posts', page=page-1) }}">Newer Posts →</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+
+
+{% include "footer.html" %}
+

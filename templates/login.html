@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="/static/css/style2.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+</head>
+<body id="body">
+    <header>
+        {% include "header.html"%}
+    </header>
+    
+    <div class="card container d-flex justify-content-center align-items-center">
+        <h1 id="login-main">
+            Login
+        </h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert alert-info">
+                    <ul class="messages">
+                        {% for category, message in messages %}
+                            <li{% if category == 'error' %} class="alert-danger"{% endif %}>
+                                {{ message }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endwith %}
+        <form method="post">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.email.label }} <br>
+                {{ form.email() }}
+            </div>
+            <div class="form-group" id="pass-section">
+                {{ form.password.label }} {{ form.password() }}
+            </div>
+            <div class="text-center">
+                {{ form.submit(class="btn btn-dark") }}
+            </div>
+        </form>
+    </div>
+
+
+    <!-- Add this in your "footer.html" file -->
+<footer>
+    <div class="login-footer small text-center text-muted fst-italic">Copyright &copy; Amit Yadav, 2023</div>
+</footer>
+
+
+</body>
+
+</html>

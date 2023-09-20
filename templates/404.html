@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>403 Forbidden</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <style>
+    body {
+        background-image: url('https://images.unsplash.com/photo-1623018035782-b269248df916?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2670&q=80');
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        -webkit-backdrop-filter: blur(5px) brightness(50%); /* Adjusted backdrop filter */
+        backdrop-filter: blur(5px) brightness(50%); /* Adjusted backdrop filter */
+        }
+
+    header {
+    top: 0;
+    position: fixed;
+    background-color: rgba(240, 248, 255, 0.5); /* Adjusted background color with transparency */
+    width: 100%;
+    backdrop-filter: blur(5px) brightness(50%); /* Adjusted backdrop filter */
+    }
+    footer {
+    bottom: 0;
+    position: fixed;
+    width: 100%;
+    }
+
+  </style>
+</head>
+<body>
+    <header>
+        {% include "header.html"%}
+    </header>
+    <div class="main container mt-5 d-flex flex-column justify-content-center align-items-center text-center" style="padding: 10px;">
+        <div class="alert alert-danger" role="alert" style="padding: 30px;">
+            <h4 class="alert-heading">ERROR 404</h4>
+            <p>PAGE NOT FOUND</p>
+      
+            <a href="{{ url_for('get_all_posts') }}" style="text-decoration: none; color: white;">
+              <button class="btn btn-dark">Go Back</button>
+            </a>
+          
+        </div>
+    </div>  
+    
+  <footer>
+    <div class="login-footer small text-center text-muted fst-italic hallabol">Copyright &copy; Amit Yadav, 2023</div>
+  </footer>
+    
+</body>
+</html>
