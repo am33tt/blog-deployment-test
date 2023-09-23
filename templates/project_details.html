@@ -1,0 +1,73 @@
+{% block content %} {% include "header.html" %}
+
+{{bootstrap.load_css()}}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<!-- Page Header -->
+
+<header
+  class="masthead"
+  
+>
+  <div class="container position-relative px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+      <div class="col-md-10 col-lg-8 col-xl-7">
+        <div class="page-heading">
+          <!-- TODO: Show a different h1 if editing existing post -->
+          <h1>Add New Project</h1>
+          <span class="subheading"
+            >Congratulations on your new project!</span
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="mb-4">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <!-- TODO:-Add CKEditor and render the form here -->
+
+        <form method="post">
+          {{ ckeditor.load() }}
+          {{ ckeditor.config(name='body') }}
+
+          {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class="flash-messages">
+              {% for message in messages %}
+                <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          {% endwith %}
+
+          <div class="form-group">
+            {{ form.hidden_tag() }}
+            <p class="form-edit">Title</p>
+            {{ form.title(class="form-control") }}
+          </div>
+          <div class="form-group">
+            <p class="form-edit">Sub-Title</p>
+            {{ form.subtitle(class="form-control") }}
+          </div>
+          <div class="form-group">
+            <p class="form-edit">Image Url</p>
+            {{ form.img_url(class="form-control") }}
+        </div>
+        <div class="form-group">
+            <p class="form-edit">Content</p>
+            {{ form.body(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-dark") }}
+        </div>
+          
+        </form>
+        
+      </div>
+    </div>
+  </div>
+</main>
+{% include "footer.html" %} {% endblock %}

@@ -38,6 +38,12 @@ class BlogPost(db.Model):
     author = db.Column(db.String(250), nullable=False)
     img_url = db.Column(db.String(250), nullable=False)
 
+class Project(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(250), unique=True, nullable=False)
+    subtitle = db.Column(db.String(250), nullable=False)
+    body = db.Column(db.Text, nullable=False)
+    img_url = db.Column(db.String(250), nullable=False)
 
 class  Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -71,6 +77,13 @@ class CreatePostForm(FlaskForm):
     body = CKEditorField("Blog Content", validators=[DataRequired()])
     submit = SubmitField("Create Post")
 
+class AddProjectForm(FlaskForm):
+    title = StringField("Project Title", validators=[DataRequired()])
+    subtitle = StringField("Subtitle", validators=[DataRequired()])
+    img_url = StringField("Project Image URL", validators=[DataRequired()])
+    body = CKEditorField("Project Content", validators=[DataRequired()])
+    submit = SubmitField("Add Project")
+
 class RegisterForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired(), Email()])
@@ -81,8 +94,6 @@ class LoginForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
     password = PasswordField("Password", validators=[DataRequired(), Length(min=8)])
     submit = SubmitField("Log In")
-
-
 
 with app.app_context():
     db.create_all()
@@ -196,6 +207,49 @@ def page_not_found(e):
 def contact():
     return render_template("contact.html")
 
+@app.route("/add-project", methods=['GET', 'POST'])
+@login_required
+def add_project():
+    form = AddProjectForm()
+    if form.validate_on_submit():
+        new_project = Project(
+            title=form.title.data,
+            subtitle=form.subtitle.data,
+            img_url=form.img_url.data,
+            body=form.body.data,
+        )
+        db.session.add(new_project)
+        db.session.commit()
+        flash('New project added successfully!', 'success')
+        return redirect(url_for('projects'))
+    return render_template("project_details.html", form=form)
+
+@app.route('/my-projects')
+def projects():
+    with app.app_context():
+        all_projects = Project.query.all() 
+        project_list = [{
+            "id": items.id,
+            "title": items.title,
+            "subtitle": items.subtitle,
+            "body": items.body,
+            "img_url": items.img_url,
+        } for items in all_projects]
+    return render_template("projects.html", projects=project_list)
+
+@app.route('/project-home/<id>', methods=['GET', 'POST'])
+def project_home(id):
+    with app.app_context():
+        project = Project.query.get(id)
+        project_list = {
+            "id": project.id,
+            "title": project.title,
+            "subtitle": project.subtitle,
+            "body": project.body,
+            "img_url": project.img_url,
+        }
+    return render_template("project_home.html", project=project_list)
+
 
 @app.route("/register", methods=['GET', 'POST'])
 @login_required
@@ -237,6 +291,8 @@ def login():
             flash('Email does not exist, please try again.', 'danger')
             return redirect(url_for('login'))
     return render_template("login.html", form=form)
+
+
 
 
 @app.route('/logout')

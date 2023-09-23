@@ -1,0 +1,57 @@
+{% include "header.html" %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+<!-- Page Header-->
+<style>
+    h1{
+        color: black;
+        font-weight: 900;
+    }
+    .masthead{
+        height: 200px;
+    }
+    .card { 
+        margin: 20px 10px;
+        border-radius: 15px;
+    }
+    .card-title{
+        font-weight: 900;
+    }
+    .card-img-top{
+        border-radius: 15px;
+    }
+</style>
+<header
+  class="masthead"
+  style="background-image: url('../static/assets/img/me.jpg')"
+>
+</header>
+
+<div class="container" style=" width: 100%;">
+            <div class="row justify-content-center">
+              <div class="col-md-10 col-lg-8 col-xl-7">
+                <div class="site-heading text-center">
+                  <h1>My Projects</h1>
+                  <span class="subheading"></span>
+                </div>
+              </div>
+            </div>
+    <div class="container" style="margin: 10px 0;">
+        <div class="row">
+            {% for project in projects %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card">
+                  <a href="{{url_for('project_home', id=project.id)}}"><img src="{{project.img_url}}" class="card-img-top" alt="..."></a>
+                  <div class="card-body">
+                    <h5 class="card-title">{{project.title}}</h5>
+                    <p class="card-text">{{project.subtitle}}</p>
+                  </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+      </div>
+</div>
+
+{% include "footer.html" %}
+
+
