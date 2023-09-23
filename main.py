@@ -8,6 +8,7 @@ from flask_ckeditor import CKEditor, CKEditorField
 from datetime import datetime, date
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_mail import Mail, Message
 import smtplib
 import os
 
@@ -217,22 +218,29 @@ def page_not_found(e):
     return render_template('404.html'), 404
 
 
-@app.route("/contact")
+@app.route("/contact", methods=['GET', 'POST'])
 def contact():
     form = ContactForm()
     if form.validate_on_submit():
-        name = form.name.data,
-        email = form.email.data,
-        phone = form.phone.data,
+        # Validate reCAPTCHA
+        if not form.recaptcha.data:
+            flash('Please complete the reCAPTCHA verification.', 'danger')
+            return redirect(url_for('contact'))
+        name = form.name.data
+        email = form.email.data
+        phone = form.phone.data
         message = form.message.data
-        with smtplib.SMTP('smtp.gmail.com') as connection:
-            connection.starttls()
-            connection.login(user=os.environ.get('EMAIL'), password=os.environ.get('PASSWORD'))
-            connection.sendmail(from_addr=os.environ.get('EMAIL'),
-                                to_addrs=os.environ.get('EMAIL'),
-                                msg=f'Subject:New Message\n\nName: {name}\nEmail: {email}\nPhone: {phone}\nMessage: {message}')
-        flash('Message sent successfully!', 'success')
+        try:
+            # Send email using Flask-Mail
+            msg = Message('New Message', sender=os.environ.get('EMAIL'), recipients=[os.environ.get('EMAIL')])
+            msg.body = f'Name: {name}\nEmail: {email}\nPhone: {phone}\nMessage: {message}'
+            Mail.send(msg)
+            flash('Message sent successfully!', 'success')
+        except Exception as e:
+            flash('An error occurred while sending the message. Please try again later.', 'danger')
+        
         return redirect(url_for('contact'))
+
     return render_template("contact.html", form=form)
 
 @app.route("/add-project", methods=['GET', 'POST'])

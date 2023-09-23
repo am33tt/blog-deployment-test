@@ -60,11 +60,12 @@
             </div>
             <div class="form-group">
               <label for="recaptcha" class="form-label">reCAPTCHA</label>
+              {{ form.recaptcha.label }}
               {{ form.recaptcha }}
               {% if form.recaptcha.errors %}
                   <p class="text-danger">{{ form.recaptcha.errors[0] }}</p>
               {% endif %}
-          </div>
+            </div>                       
           <div class="form-group">
             {{ form.submit(class="btn btn-dark") }}
           </div>
