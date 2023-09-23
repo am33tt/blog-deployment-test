@@ -1,13 +1,14 @@
 from flask import Flask, render_template, redirect, url_for, flash, make_response, request
 from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
-from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField
+from flask_wtf import FlaskForm, Recaptcha
+from wtforms import StringField, SubmitField, PasswordField, TextAreaField
 from wtforms.validators import DataRequired, URL, Email, Length
 from flask_ckeditor import CKEditor, CKEditorField
 from datetime import datetime, date
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
+import smtplib
 import os
 
 
@@ -15,11 +16,15 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 Bootstrap5(app)
 
+
 # CONNECT TO DB
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', "sqlite:///posts.db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = os.environ.get('BOOL')
+app.config['RECAPTCHA_PUBLIC_KEY'] = os.environ.get('PUBLIC_KEY')
+app.config['RECAPTCHA_PRIVATE_KEY'] = os.environ.get('PRIVATE_KEY')
 db = SQLAlchemy()
 db.init_app(app)
+Recaptcha(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -94,6 +99,15 @@ class LoginForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
     password = PasswordField("Password", validators=[DataRequired(), Length(min=8)])
     submit = SubmitField("Log In")
+
+class ContactForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    phone = StringField('Phone Number', validators=[DataRequired(), Length(min=10, max=300)])
+    message = TextAreaField('Message', validators=[DataRequired()])
+    submit = SubmitField('Send Message')
+    recaptcha = Recaptcha()
+
 
 with app.app_context():
     db.create_all()
@@ -205,7 +219,21 @@ def page_not_found(e):
 
 @app.route("/contact")
 def contact():
-    return render_template("contact.html")
+    form = ContactForm()
+    if form.validate_on_submit():
+        name = form.name.data,
+        email = form.email.data,
+        phone = form.phone.data,
+        message = form.message.data
+        with smtplib.SMTP('smtp.gmail.com') as connection:
+            connection.starttls()
+            connection.login(user=os.environ.get('EMAIL'), password=os.environ.get('PASSWORD'))
+            connection.sendmail(from_addr=os.environ.get('EMAIL'),
+                                to_addrs=os.environ.get('EMAIL'),
+                                msg=f'Subject:New Message\n\nName: {name}\nEmail: {email}\nPhone: {phone}\nMessage: {message}')
+        flash('Message sent successfully!', 'success')
+        return redirect(url_for('contact'))
+    return render_template("contact.html", form=form)
 
 @app.route("/add-project", methods=['GET', 'POST'])
 @login_required

@@ -1,5 +1,6 @@
 {% include "header.html" %}
-
+{{bootstrap.load_css()}}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <!-- Page Header-->
 <header
   class="masthead"
@@ -23,78 +24,56 @@
 <!-- Main Content-->
 <main class="mb-4">
   <div class="container px-4 px-lg-5">
-    <div class="row gx-4 gx-lg-5 justify-content-center">
+    <div class="row justify-content-center">
       <div class="col-md-10 col-lg-8 col-xl-7">
         <p>
-          Want to get in touch? Fill out the form below to send me a message and
-          I will get back to you as soon as possible!
+          Want to get in touch? Fill out the form below to send me a message,
+          and I will get back to you as soon as possible!
         </p>
         <div class="my-5">
-          <!-- * * * * * * * * * * * * * * *-->
-          <!-- * * Simplified SB Contact Form for the Tutorial* *-->
-          <form
-            id="contactForm"
-            name="sentMessage"
-            action="{{ url_for('contact') }}"
-            method="post"
-          >
-            <div class="form-floating">
-              <input
-                class="form-control"
-                id="name"
-                name="name"
-                type="text"
-                placeholder="Enter your name..."
-                required
-              />
-              <label for="name">Name</label>
+          <form method="post" style="max-width: 500px;" class="mx-auto">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <ul class="flash-messages">
+              {% for message in messages %}
+              <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            {% endwith %}
+            <div class="form-group">
+              {{ form.hidden_tag() }}
+              <label for="name" class="form-label">Name</label>
+              {{ form.name(class="form-control", id="name") }}
             </div>
-            <div class="form-floating">
-              <input
-                class="form-control"
-                id="email"
-                name="email"
-                type="email"
-                placeholder="Enter your email..."
-                required
-              />
-              <label for="email">Email address</label>
+            <div class="form-group">
+              <label for="email" class="form-label">Email</label>
+              {{ form.email(class="form-control", id="email") }}
             </div>
-            <div class="form-floating">
-              <input
-                class="form-control"
-                id="phone"
-                name="phone"
-                type="tel"
-                placeholder="Enter your phone number..."
-                required
-              />
-              <label for="phone">Phone Number</label>
+            <div class="form-group">
+              <label for="phone" class="form-label">Phone</label>
+              {{ form.phone(class="form-control", id="phone") }}
             </div>
-            <div class="form-floating">
-              <textarea
-                class="form-control"
-                id="message"
-                name="message"
-                placeholder="Enter your message here..."
-                required
-                style="height: 12rem"
-              ></textarea>
-              <label for="message">Message</label>
+            <div class="form-group">
+              <label for="message" class="form-label">Message</label>
+              {{ form.message(class="form-control", id="message") }}
             </div>
-            <br />
-            <button
-              class="btn btn-danger text-uppercase"
-              id="submitButton"
-              type="submit"
-            >
-              Send Message
-            </button>
+            <div class="form-group">
+              <label for="recaptcha" class="form-label">reCAPTCHA</label>
+              {{ form.recaptcha }}
+              {% if form.recaptcha.errors %}
+                  <p class="text-danger">{{ form.recaptcha.errors[0] }}</p>
+              {% endif %}
+          </div>
+          <div class="form-group">
+            {{ form.submit(class="btn btn-dark") }}
+          </div>
           </form>
         </div>
       </div>
     </div>
   </div>
 </main>
+
 
 {% include "footer.html" %}
