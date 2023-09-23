@@ -57,18 +57,10 @@
             <div class="form-group">
               <label for="message" class="form-label">Message</label>
               {{ form.message(class="form-control", id="message") }}
-            </div>
+            </div>                   
             <div class="form-group">
-              <label for="recaptcha" class="form-label">reCAPTCHA</label>
-              {{ form.recaptcha.label }}
-              {{ form.recaptcha }}
-              {% if form.recaptcha.errors %}
-                  <p class="text-danger">{{ form.recaptcha.errors[0] }}</p>
-              {% endif %}
-            </div>                       
-          <div class="form-group">
-            {{ form.submit(class="btn btn-dark") }}
-          </div>
+              {{ form.submit(class="btn btn-dark") }}
+            </div>
           </form>
         </div>
       </div>

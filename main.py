@@ -1,15 +1,15 @@
 from flask import Flask, render_template, redirect, url_for, flash, make_response, request
 from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
-from flask_wtf import FlaskForm, Recaptcha
+from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField, TextAreaField
 from wtforms.validators import DataRequired, URL, Email, Length
 from flask_ckeditor import CKEditor, CKEditorField
 from datetime import datetime, date
-from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
+from flask_login import login_user, LoginManager, login_required, current_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_mail import Mail, Message
-import smtplib
+from flask_wtf.csrf import CSRFProtect
 import os
 
 
@@ -17,15 +17,19 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 Bootstrap5(app)
 
-
 # CONNECT TO DB
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', "sqlite:///posts.db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = os.environ.get('BOOL')
-app.config['RECAPTCHA_PUBLIC_KEY'] = os.environ.get('PUBLIC_KEY')
-app.config['RECAPTCHA_PRIVATE_KEY'] = os.environ.get('PRIVATE_KEY')
+# Flask-Mail Configuration
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # Replace with your SMTP server address
+app.config['MAIL_PORT'] = 587  # Port for TLS (587 for TLS, 465 for SSL)
+app.config['MAIL_USE_TLS'] = True  # Use TLS (True/False)
+app.config['MAIL_USERNAME'] = os.environ.get('EMAIL')
+app.config['MAIL_PASSWORD'] = os.environ.get('PASSWORD')
+
 db = SQLAlchemy()
 db.init_app(app)
-Recaptcha(app)
+mail = Mail(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -104,10 +108,10 @@ class LoginForm(FlaskForm):
 class ContactForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
-    phone = StringField('Phone Number', validators=[DataRequired(), Length(min=10, max=300)])
-    message = TextAreaField('Message', validators=[DataRequired()])
+    phone = StringField('Phone Number', validators=[DataRequired(), Length(min=10, max=10)])
+    message = TextAreaField('Message', validators=[DataRequired(), Length(min=10, max=500)])
     submit = SubmitField('Send Message')
-    recaptcha = Recaptcha()
+    
 
 
 with app.app_context():
@@ -217,31 +221,25 @@ def about():
 def page_not_found(e):
     return render_template('404.html'), 404
 
-
 @app.route("/contact", methods=['GET', 'POST'])
 def contact():
     form = ContactForm()
     if form.validate_on_submit():
-        # Validate reCAPTCHA
-        if not form.recaptcha.data:
-            flash('Please complete the reCAPTCHA verification.', 'danger')
-            return redirect(url_for('contact'))
         name = form.name.data
         email = form.email.data
         phone = form.phone.data
         message = form.message.data
         try:
-            # Send email using Flask-Mail
+            mail = Mail(app)
             msg = Message('New Message', sender=os.environ.get('EMAIL'), recipients=[os.environ.get('EMAIL')])
             msg.body = f'Name: {name}\nEmail: {email}\nPhone: {phone}\nMessage: {message}'
-            Mail.send(msg)
+            mail.send(msg)
             flash('Message sent successfully!', 'success')
         except Exception as e:
-            flash('An error occurred while sending the message. Please try again later.', 'danger')
-        
+            flash(f'An error occurred while sending the message. Please try again later.:{e}', 'danger')
         return redirect(url_for('contact'))
-
     return render_template("contact.html", form=form)
+
 
 @app.route("/add-project", methods=['GET', 'POST'])
 @login_required
