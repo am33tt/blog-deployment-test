@@ -1,7 +1,7 @@
 {% include "header.html" %}
 
 <!-- Page Header-->
-<header class="masthead" style="background-image: url('{{project.img_url}}')">
+<header class="masthead" style="background-image: url('/static/assets/img/me.jpg')">
 </header>
 
 <!-- Post Content -->
@@ -12,6 +12,7 @@
             <div class="post-heading">
                 <h1>{{ project.title }}</h1>
                 <h4 class="subheading">{{ project.subtitle }}</h4>
+                <img src="{{url('{{project.img_url}}')}}" alt="Project Image">
             </div>
             </div>
         </div>
