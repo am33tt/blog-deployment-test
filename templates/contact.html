@@ -56,7 +56,7 @@
             </div>
             <div class="form-group">
               <label for="message" class="form-label">Message</label>
-              {{ form.message(class="form-control", id="message") }}
+              <textarea class="form-control" id="message" name="message" rows="3"></textarea>
             </div>                   
             <div class="form-group">
               {{ form.submit(class="btn btn-dark") }}
@@ -68,5 +68,19 @@
   </div>
 </main>
 
+<!-- JavaScript for auto-resizing textarea -->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Function to auto-resize textarea
+    function autoResizeTextarea() {
+      this.style.height = 'auto';
+      this.style.height = this.scrollHeight + 'px';
+    }
+
+    // Attach the event listener to the textarea
+    var textarea = document.getElementById('message');
+    textarea.addEventListener('input', autoResizeTextarea);
+  });
+</script>
 
 {% include "footer.html" %}
